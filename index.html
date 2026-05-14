@@ -1,0 +1,91 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+    <meta charset="UTF-8">
+    <title>Firebase Üyelik Sistemi</title>
+    <style>
+        body { font-family: sans-serif; display: flex; justify-content: center; padding-top: 50px; }
+        .container { border: 1px solid #ccc; padding: 20px; border-radius: 8px; width: 300px; }
+        input { width: 90%; margin-bottom: 10px; padding: 8px; }
+        button { width: 100%; padding: 10px; cursor: pointer; margin-top: 5px; }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <h2 id="status-title">Giriş Yap</h2>
+    <input type="email" id="email" placeholder="E-posta">
+    <input type="password" id="password" placeholder="Şifre">
+    <button id="btnLogin">Giriş Yap</button>
+    <button id="btnSignup">Kayıt Ol</button>
+    <button id="btnLogout" style="display:none;">Çıkış Yap</button>
+    <p id="message"></p>
+</div>
+
+<!-- Firebase Modülleri -->
+<script type="module">
+  // Firebase SDK'larını içe aktarma
+  import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
+  import { getAuth, createUserWithEmailAndPassword, signInWithEmailAndPassword, signOut, onAuthStateChanged } 
+  from "https://www.gstatic.com/firebasejs/10.8.0/firebase-auth.js";
+
+  // SİZİN YAPILANDIRMANIZ (Burayı Firebase'den aldığınız bilgilerle değiştirin)
+  const firebaseConfig = {
+    apiKey: "AIzaSyAc-DYd6_DCIvMUcFNEL5CcuBbg0m-OmdU",
+    authDomain: "bora0730.firebaseapp.com",
+    projectId: "bora0730",
+    storageBucket: "bora0730.firebasestorage.app",
+    messagingSenderId: "683797018624",
+    appId: "1:683797018624:web:56f93aa34cf94a62d600e5"
+  };
+
+  // Firebase'i başlat
+  const app = initializeApp(firebaseConfig);
+  const auth = getAuth(app);
+
+  // DOM Elemanları
+  const emailInput = document.getElementById('email');
+  const passInput = document.getElementById('password');
+  const msgText = document.getElementById('message');
+
+  // KAYIT OLMA
+  document.getElementById('btnSignup').addEventListener('click', () => {
+    const email = emailInput.value;
+    const pass = passInput.value;
+    createUserWithEmailAndPassword(auth, email, pass)
+      .then(() => msgText.innerText = "Kayıt başarıyla oluşturuldu!")
+      .catch((error) => msgText.innerText = "Hata: " + error.message);
+  });
+
+  // GİRİŞ YAPMA
+  document.getElementById('btnLogin').addEventListener('click', () => {
+    const email = emailInput.value;
+    const pass = passInput.value;
+    signInWithEmailAndPassword(auth, email, pass)
+      .then(() => msgText.innerText = "Giriş başarılı!")
+      .catch((error) => msgText.innerText = "Hata: " + error.message);
+  });
+
+  // ÇIKIŞ YAPMA
+  document.getElementById('btnLogout').addEventListener('click', () => {
+    signOut(auth).then(() => msgText.innerText = "Çıkış yapıldı.");
+  });
+
+  // KULLANICI DURUMUNU İZLEME
+  onAuthStateChanged(auth, (user) => {
+    if (user) {
+      document.getElementById('status-title').innerText = "Hoş geldin, " + user.email;
+      document.getElementById('btnLogout').style.display = "block";
+      document.getElementById('btnLogin').style.display = "none";
+      document.getElementById('btnSignup').style.display = "none";
+    } else {
+      document.getElementById('status-title').innerText = "Giriş Yap";
+      document.getElementById('btnLogout').style.display = "none";
+      document.getElementById('btnLogin').style.display = "inline-block";
+      document.getElementById('btnSignup').style.display = "inline-block";
+    }
+  });
+</script>
+
+</body>
+</html>
